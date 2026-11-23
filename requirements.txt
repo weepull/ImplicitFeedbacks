@@ -1,0 +1,16 @@
+# Python 3.11. mlx / mlx-vlm are Apple Silicon only (used for the local Qwen VLM labeller).
+torch==2.15.0
+torchvision==0.29.2
+open-clip-torch==4.2.2
+transformers==5.24.0
+huggingface-hub==2.4.0
+numpy==2.4.6
+pandas==3.1.1
+pyarrow==26.0.1
+scipy==1.17.1
+scikit-learn==1.9.1
+opencv-python-headless==5.1.0.95
+pillow==13.0.0
+tqdm==4.70.1
+mlx==0.32.4
+mlx-vlm==0.8.0

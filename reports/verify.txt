@@ -1,0 +1,67 @@
+
+######## verify splits  2026-11-23 15:35
+
+== A. Split robustness: personal+prior vs population at different time cut points
+  train first 50%: n_test= 2484  population 0.690  personal+prior 0.696  gap +0.006 [-0.007,+0.019]
+  train first 60%: n_test= 1988  population 0.687  personal+prior 0.695  gap +0.008 [-0.008,+0.024]
+  train first 70%: n_test= 1493  population 0.685  personal+prior 0.700  gap +0.015 [-0.002,+0.032]
+  train first 80%: n_test=  995  population 0.693  personal+prior 0.717  gap +0.024 [+0.000,+0.046]
+
+######## verify rank  2026-11-23 15:35
+
+== B. Reranker as ranker: prompts where a user compared >=3 images (test period only)
+   ground truth = image with the most wins in that user's comparisons for that prompt (ties dropped)
+   groups: 154
+   top-1 hit rate  random             0.208 ± 0.008
+   top-1 hit rate  prompt_alignment   0.292 ± 0.037
+   top-1 hit rate  population         0.396 ± 0.039
+   top-1 hit rate  personal+prior     0.383 ± 0.039
+
+######## verify paraphrase  2026-11-23 15:35
+
+== D. Paraphrase test with independently written wordings (corr of image scores, 4000 images)
+   photoreal vs illustrated   r = +0.71  ok
+   anime vs western           r = +0.38  UNRELIABLE
+   dark vs bright             r = +0.49  WORDING-SENSITIVE
+   saturated vs muted         r = +0.71  ok
+   dramatic vs flat light     r = +0.29  UNRELIABLE
+   busy vs minimal            r = +0.42  WORDING-SENSITIVE
+   close-up vs wide           r = +0.57  WORDING-SENSITIVE
+   low vs eye-level angle     r = +0.22  UNRELIABLE
+   action vs calm             r = +0.59  WORDING-SENSITIVE
+   cute vs serious            r = +0.52  WORDING-SENSITIVE
+   fantasy vs everyday        r = +0.68  WORDING-SENSITIVE
+   people vs no people        r = +0.78  ok
+   painterly vs crisp         r = +0.70  WORDING-SENSITIVE
+
+######## verify readout  2026-11-23 15:36
+
+== C1. Planted-preference recovery: synthetic user = population + known effect on one axis
+   labels resampled on a real user's pairs; does the readout return the planted effect?
+   close-up vs wide           planted +0.0 -> recovered +0.004 (sd 0.010); mean |leak| into other axes 0.010  [n_pairs=440]
+   close-up vs wide           planted +0.5 -> recovered +0.032 (sd 0.010); mean |leak| into other axes 0.013  [n_pairs=440]
+   close-up vs wide           planted +1.0 -> recovered +0.058 (sd 0.010); mean |leak| into other axes 0.013  [n_pairs=440]
+   dark vs bright             planted +0.0 -> recovered -0.006 (sd 0.013); mean |leak| into other axes 0.007  [n_pairs=440]
+   dark vs bright             planted +0.5 -> recovered +0.038 (sd 0.006); mean |leak| into other axes 0.011  [n_pairs=440]
+   dark vs bright             planted +1.0 -> recovered +0.073 (sd 0.007); mean |leak| into other axes 0.011  [n_pairs=440]
+   photoreal vs illustrated   planted +0.0 -> recovered +0.005 (sd 0.015); mean |leak| into other axes 0.010  [n_pairs=440]
+   photoreal vs illustrated   planted +0.5 -> recovered +0.042 (sd 0.007); mean |leak| into other axes 0.008  [n_pairs=440]
+   photoreal vs illustrated   planted +1.0 -> recovered +0.069 (sd 0.007); mean |leak| into other axes 0.009  [n_pairs=440]
+
+== C2. Real-data agreement: for each user x axis, does the image further toward the axis win more often
+   in the user's held-out pairs, in the direction the readout says? (only pairs with |dz| > 0.5)
+   clear readouts whose sign matches held-out behaviour: 10/17
+   correlation(readout effect, held-out win-rate excess) over all user x axis: 0.16  (n=130)
+
+######## verify app  2026-11-23 15:36
+
+== E1. Rating app over HTTP with a simulated user (oracle = a stand-in user's fitted taste)
+   40 choices posted -> 40 feedback rows, all fields present: True, profile saved with n_pairs=40
+   /profile with context renders: True
+
+== E2. Active vs random pair selection (simulated users, 3 oracles x 3 seeds, held-out oracle agreement)
+   agreement with oracle before any ratings (population prior): 0.635
+   after  10 ratings: active 0.639   random 0.641
+   after  25 ratings: active 0.642   random 0.646
+   after  50 ratings: active 0.653   random 0.656
+   after 100 ratings: active 0.662   random 0.662
